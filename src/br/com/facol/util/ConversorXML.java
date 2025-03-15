@@ -6,10 +6,22 @@ import java.util.Collection;
 public class ConversorXML {
 	
 	public String converte(Object objeto) {
-		Class<?> classeObjeto = objeto.getClass();
-		StringBuilder xmlBuilder = new StringBuilder();
-		
+		//<lista>
+		//<produto>
+//			<nome>Produto 1</nome>
+//			<valor>20.0</valor>
+//			<marca>Marca 1</marca>
+		//</produto>
+		//<produto>
+//			<nome>Produto 2</nome>
+//			<valor>20.0</valor>
+//			<marca>Marca 2</marca>
+		//</produto>
+		//</lista>
 		try {
+			Class<?> classeObjeto = objeto.getClass();
+			StringBuilder xmlBuilder = new StringBuilder();
+			
 			if(objeto instanceof Collection) {
 				Collection<?> colecao = (Collection<?>) objeto; 
 				
@@ -23,23 +35,24 @@ public class ConversorXML {
 				xmlBuilder.append("</lista>");
 			} else {
 				
-				NomeTagXml nomeTagXml = classeObjeto.getDeclaredAnnotation(NomeTagXml.class);
+				NomeTagXml anotacaoClasse = classeObjeto.getDeclaredAnnotation(NomeTagXml.class);
 				
 				String nomeClasse = 
-						nomeTagXml == null
+						anotacaoClasse == null
 						? classeObjeto.getName()
-						: nomeTagXml.value();
+						: anotacaoClasse.value();
 				
 				xmlBuilder.append("<"+nomeClasse+">");
 				
 				for(Field atributo : classeObjeto.getDeclaredFields()) {
 					atributo.setAccessible(true);
 					
-					NomeTagXml nomeTag = classeObjeto.getDeclaredAnnotation(NomeTagXml.class);
+					NomeTagXml anotacaoAtributo = atributo.getDeclaredAnnotation(NomeTagXml.class);
 					
-					String nomeAtributo = nomeTag == null
+					String nomeAtributo = 
+							anotacaoAtributo == null
 							? atributo.getName()
-									: nomeTag.value();
+							: anotacaoAtributo.value();
 					
 					Object valorAtributo = atributo.get(objeto);
 					
@@ -50,12 +63,14 @@ public class ConversorXML {
 				
 				xmlBuilder.append("</"+nomeClasse+">");
 			}
+			
+			return xmlBuilder.toString();
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 		
-		return xmlBuilder.toString();
+		
 	}
 
 }

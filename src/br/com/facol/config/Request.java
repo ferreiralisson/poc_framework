@@ -12,6 +12,13 @@ public class Request {
     private Map<String, Object> queryParams;
 
     public Request(String url){
+    	/*
+		 * Casos possiveis:
+		 * /controlador/metodo
+		 * /controlador/metodo?param1=valor1&param2=valor2
+		 * 
+		 * /controlador/metodo param1=valor1&param2=valor2
+		 */
         String[] partsUrl = url.replaceFirst("/", "")
                 .split("[?]");
 
